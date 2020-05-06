@@ -141,9 +141,25 @@ for i in range(len(predictions)):
 
 print("\n\nCorrectly classified ",str(correct)," MFCC vectors out of ",str(len(predictions)), " MFCC vectors. ( ", str((correct/len(predictions))*100), " % )" )
 
-name = str(input("\n\nSaving Model, Enter a name to save as: "))
+#name = str(input("\n\nSaving Model, Enter a name to save as: "))
 
-model.save("models/mfcc_classifier/" + name + ".h5")
+#model.save("models/mfcc_classifier/" + name + ".h5")
+import os
+
+name = ""
+cond = True
+while cond:
+    name = str(input("\n\nSaving Model, Enter a name to save as: "))
+    for file_name in os.listdir("models/mfcc_classifier/"):
+        if name == file_name:
+            print("File already exists, pick another name")
+            continue
+    cond = False
+        
+try:
+        model.save("models/mfcc_classifier/" + name + ".h5")
+except:
+    print("File system is busy, could not save model")
 
 
 del model

@@ -126,9 +126,26 @@ for i in range(len(predictions)):
 
 print("\n\nCumulative L1 Norm b/w predicted and validation MFCC vectors (",str(len(diff))," MFCC vectors): ",sum(diff))
 
-name = str(input("\n\nSaving Model, Enter a name to save as: "))
+#name = str(input("\n\nSaving Model, Enter a name to save as: "))
 
-model.save("models/mfcc_converter/" + name + ".h5")
+#model.save("models/mfcc_converter/" + name + ".h5")
+
+import os
+
+name = ""
+cond = True
+while cond:
+    name = str(input("\n\nSaving Model, Enter a name to save as: "))
+    for file_name in os.listdir("models/mfcc_converter/"):
+        if name == file_name:
+            print("File already exists, pick another name")
+            continue
+    cond = False
+        
+try:
+        model.save("models/mfcc_converter/" + name + ".h5")
+except:
+    print("File system is busy, could not save model")
 
 del model
 
