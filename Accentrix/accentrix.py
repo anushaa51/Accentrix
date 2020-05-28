@@ -28,6 +28,8 @@ classifier_model = None
 try:
     converter_model = load_model("./Accentrix/final_models/" + converter_model_name)
     classifier_model = load_model("./Accentrix/final_models/" + classifier_model_name)
+    with open("./Accentrix/final_models/s_func",'rb') as f1:
+  	    scaler = pkl.load(f1)
 
 except:
     print("Could not load models.")
@@ -61,20 +63,10 @@ def preprocess_single_file(num_mfcc_coeffs, audio_file):
 def classify(mfcc_vectors):
 
     mfcc_vectors = np.reshape(mfcc_vectors, [-1, 25])
-
-    predictions = []
-
-    for mfcc_vector in mfcc_vectors:
-        predictions += list(classifier_model.predict(x = np.array([mfcc_vector])))
-
-    total_US = 0
-    total_IN = 0
-
-    for prediction in predictions:
-        total_US += prediction[0]
-        total_IN += prediction[1]
-
-    return ((total_US/len(predictions))*100, (total_IN/len(predictions))*100)
+    mfcc_vectors = scaler.transform(mfcc_vectors)
+    prediction = classifier_model.predict(x = mfcc_vectors)
+    avg_pred_across_frames = np.mean(prediction,axis=0)
+    return (avg_pred_across_frames[0]*100, (1-avg_pred_across_frames[0])*100)
 
 
 
