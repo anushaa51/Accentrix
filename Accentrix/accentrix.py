@@ -6,12 +6,13 @@ logging.getLogger('tensorflow').disabled = True # Disabling TensorFlow warnings
 import os
 import numpy as np
 
-from keras.models import load_model
+from tensorflow.python.keras.models import load_model
 
 import matplotlib.pyplot as plt
 import librosa.display
 import base64
 import numpy as np
+import pickle as pkl
 
 import scipy.io.wavfile as wav
 from python_speech_features import mfcc
@@ -20,20 +21,19 @@ num_mfcc_coeffs = 25
 
 converter_model_name = "converter.h5"
 
-classifier_model_name = "classifier.h5"
+classifier_model_name = "Binary_Classifier_N2.h5"
 
 converter_model = None
 classifier_model = None
 
-try:
+try : 
     converter_model = load_model("./Accentrix/final_models/" + converter_model_name)
     classifier_model = load_model("./Accentrix/final_models/" + classifier_model_name)
     with open("./Accentrix/final_models/s_func",'rb') as f1:
   	    scaler = pkl.load(f1)
-
 except:
-    print("Could not load models.")
-    exit()
+	print("Some error")
+	exit()
 
 
 def preprocess_single_file(num_mfcc_coeffs, audio_file):
@@ -62,7 +62,7 @@ def preprocess_single_file(num_mfcc_coeffs, audio_file):
 
 def classify(mfcc_vectors):
 
-    mfcc_vectors = np.reshape(mfcc_vectors, [-1, 25])
+    mfcc_vectors = np.array(mfcc_vectors).reshape((-1, 25))
     mfcc_vectors = scaler.transform(mfcc_vectors)
     prediction = classifier_model.predict(x = mfcc_vectors)
     avg_pred_across_frames = np.mean(prediction,axis=0)
@@ -177,4 +177,3 @@ def get_results(audio_name, from_accent, to_accent):
     results_dict = {'mfcc_input': before_image_string, 'mfcc_output': after_image_string, 'cbc': cbc, 'cac': cac, 'mcbc': mcbc, 'mcac': mcac, 'mcaoc': "97.26 %", 'ca': "95.4638 %", 'classifier1': classifier1, 'classifier2': classifier2, 'converter1': converter1, 'converter2': converter2 }
 
     return results_dict
-
