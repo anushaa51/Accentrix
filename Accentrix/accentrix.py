@@ -21,7 +21,7 @@ num_mfcc_coeffs = 25
 
 converter_model_name = "converter.h5"
 
-classifier_model_name = "Binary_Classifier_N2.h5"
+classifier_model_name = "classifier.h5"
 
 converter_model = None
 classifier_model = None
@@ -33,7 +33,6 @@ try :
   	    scaler = pkl.load(f1)
 except:
 	print("Some error")
-	exit()
 
 
 def preprocess_single_file(num_mfcc_coeffs, audio_file):
@@ -64,7 +63,9 @@ def classify(mfcc_vectors):
 
     mfcc_vectors = np.array(mfcc_vectors).reshape((-1, 25))
     mfcc_vectors = scaler.transform(mfcc_vectors)
+    #print("Hello")
     prediction = classifier_model.predict(x = mfcc_vectors)
+    print("Hello")
     avg_pred_across_frames = np.mean(prediction,axis=0)
     return (avg_pred_across_frames[0]*100, (1-avg_pred_across_frames[0])*100)
 
@@ -74,12 +75,7 @@ def classify(mfcc_vectors):
 def convert(mfcc_vectors):
         
     mfcc_vectors = np.reshape(mfcc_vectors, [-1, 25])
-
-    converted = []
-
-    for mfcc_vector in mfcc_vectors:
-        converted += list(converter_model.predict(x = np.array([mfcc_vector])))
-
+    converted = converter_model.predict(x = mfcc_vectors)
     converted = np.reshape(converted, [-1,25])
 
     return converted
